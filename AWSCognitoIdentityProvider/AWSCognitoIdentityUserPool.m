@@ -12,7 +12,9 @@
 #import <CommonCrypto/CommonHMAC.h>
 #import "NSData+AWSCognitoIdentityProvider.h"
 #import "AWSCognitoIdentityProviderModel.h"
+#if !TARGET_OS_MACCATALYST
 #import <AWSCognitoIdentityProviderASF/AWSCognitoIdentityProviderASF.h>
+#endif
 
 static const NSString * AWSCognitoIdentityUserPoolCurrentUser = @"currentUser";
 
@@ -247,7 +249,9 @@ static NSString *const AWSPinpointContextKeychainUniqueIdKey = @"com.amazonaws.A
 
 - (AWSCognitoIdentityProviderUserContextDataType *) userContextData: (NSString * _Nonnull)  username deviceId:(NSString * _Nullable) deviceId {
     AWSCognitoIdentityProviderUserContextDataType *userContextData = [AWSCognitoIdentityProviderUserContextDataType new];
+#if !TARGET_OS_MACCATALYST
     userContextData.encodedData = [AWSCognitoIdentityProviderASF userContextData:self.userPoolConfiguration.poolId username:username deviceId:deviceId userPoolClientId:self.userPoolConfiguration.clientId];
+#endif
     return userContextData;
 }
 
