@@ -50,7 +50,9 @@ NSString *const AWSCognitoAuthErrorDomain = @"com.amazon.cognito.AWSCognitoAuthE
 API_AVAILABLE(ios(11.0))
 @interface AWSCognitoAuth()
 
+#if !TARGET_OS_MACCATALYST
 @property (nonatomic, strong) SFAuthenticationSession *sfAuthSession;
+#endif
 
 @end
 
@@ -123,7 +125,11 @@ static NSString * AWSCognitoAuthAsfDeviceId = @"asf.device.id";
         NSString *idpIdentifier = infoDictionary[AWSCognitoAuthIdpIdentifier];
         NSString *identityProvider = infoDictionary[AWSCognitoAuthIdentityProvider];
         NSString *userPoolId = infoDictionary[AWSCognitoAuthPoolId];
+#if !TARGET_OS_MACCATALYST
         BOOL useSFAuthSession = infoDictionary[AWSCognitoAuthUseSFAuthSession];
+#else
+        BOOL useSFAuthSession = NO;
+#endif
 
         if (appClientId && webDomain && scopes && signOutRedirectUri && signInRedirectUri) {
             AWSCognitoAuthConfiguration *authConfiguration = [[AWSCognitoAuthConfiguration alloc] initWithAppClientId:appClientId
@@ -263,6 +269,7 @@ static NSString * AWSCognitoAuthAsfDeviceId = @"asf.device.id";
 
     if (self.useSFAuthenticationSession) {
         if (@available(iOS 11.0, *)) {
+#if !TARGET_OS_MACCATALYST
             self.sfAuthenticationSessionAvailable = YES;
             self.sfAuthSession = [[SFAuthenticationSession alloc] initWithURL:[NSURL URLWithString:url] callbackURLScheme:[self urlEncode:self.authConfiguration.signInRedirectUri] completionHandler:^(NSURL * _Nullable url, NSError * _Nullable error) {
                 if (url) {
@@ -272,6 +279,10 @@ static NSString * AWSCognitoAuthAsfDeviceId = @"asf.device.id";
                 }
             }];
             [self.sfAuthSession start];
+#else
+            self.sfAuthenticationSessionAvailable = NO;
+            [self showSFSafariViewControllerForURL:url withPresentingViewController:vc];
+#endif
         } else {
             // Fallback on earlier versions
             [self showSFSafariViewControllerForURL:url withPresentingViewController:vc];
@@ -477,6 +488,7 @@ static NSString * AWSCognitoAuthAsfDeviceId = @"asf.device.id";
 
     if (self.useSFAuthenticationSession) {
         if (@available(iOS 11.0, *)) {
+#if !TARGET_OS_MACCATALYST
             self.sfAuthenticationSessionAvailable = YES;
             self.sfAuthSession = [[SFAuthenticationSession alloc] initWithURL:[NSURL URLWithString:url] callbackURLScheme:[self urlEncode:self.authConfiguration.signOutRedirectUri] completionHandler:^(NSURL * _Nullable url, NSError * _Nullable error) {
                 if (url) {
@@ -487,6 +499,11 @@ static NSString * AWSCognitoAuthAsfDeviceId = @"asf.device.id";
                 }
             }];
             [self.sfAuthSession start];
+#else
+            self.sfAuthenticationSessionAvailable = NO;
+            [self signOutSFSafariVC:vc
+                                url:url];
+#endif
         } else {
             [self signOutSFSafariVC:vc
                                 url:url];
