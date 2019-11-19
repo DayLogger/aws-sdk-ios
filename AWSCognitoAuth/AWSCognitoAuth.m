@@ -14,7 +14,7 @@
 //
 
 #import "AWSCognitoAuth_Internal.h"
-#import <AWSCognitoIdentityProviderASF/AWSCognitoIdentityProviderASF.h>
+// #import <AWSCognitoIdentityProviderASF/AWSCognitoIdentityProviderASF.h>
 #import <SafariServices/SafariServices.h>
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonHMAC.h>
@@ -253,11 +253,11 @@ static NSString * AWSCognitoAuthAsfDeviceId = @"asf.device.id";
             suffix = [NSString stringWithFormat:@"&identity_provider=%@", self.authConfiguration.identityProvider];
         }
     }
-    if(self.authConfiguration.asfEnabled){
-        NSString *userContextEncoded = [AWSCognitoIdentityProviderASF userContextData:self.authConfiguration.userPoolId username:@"unknown" deviceId:[self asfDeviceId] userPoolClientId:self.authConfiguration.appClientId];
-        NSString * userContext = [NSString stringWithFormat:@"&userContextData=%@",[self urlEncode:userContextEncoded]];
-        suffix = [suffix stringByAppendingString:userContext];
-    }
+    // if(self.authConfiguration.asfEnabled){
+    //     NSString *userContextEncoded = [AWSCognitoIdentityProviderASF userContextData:self.authConfiguration.userPoolId username:@"unknown" deviceId:[self asfDeviceId] userPoolClientId:self.authConfiguration.appClientId];
+    //     NSString * userContext = [NSString stringWithFormat:@"&userContextData=%@",[self urlEncode:userContextEncoded]];
+    //     suffix = [suffix stringByAppendingString:userContext];
+    // }
 
     NSString *url = [NSString stringWithFormat:@"%@?response_type=code&client_id=%@&state=%@&redirect_uri=%@&scope=%@&code_challenge=%@&code_challenge_method=S256%@&%@",self.authConfiguration.signInUri, self.authConfiguration.appClientId, self.state,[self urlEncode:self.authConfiguration.signInRedirectUri], [self urlEncode:[self normalizeScopes]], self.proofKeyHash, suffix, [self getQueryStringSuffixForParameters: self.authConfiguration.signInUriQueryParameters]];
 
